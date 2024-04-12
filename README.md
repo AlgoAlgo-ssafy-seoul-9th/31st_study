@@ -44,7 +44,47 @@
 ### [민웅](./봄버맨/민웅.py)
 
 ```py
+# 16918_봄버맨_bomberman
+import sys
+input = sys.stdin.readline
+dxy = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
+R, C, N = map(int, input().split())
+
+booms = [list(input().strip()) for _ in range(R)]
+
+for n in range(N-1):
+    if not n%2:
+        for i in range(R):
+            for j in range(C):
+                if booms[i][j] == '.':
+                    booms[i][j] = 'B'
+                elif booms[i][j] == 'B':
+                    booms[i][j] = 'O'
+    elif n%2:
+        tmp = [[booms[a][b] for b in range(C)] for a in range(R)]
+        visited = [[0] * C for _ in range(R)]
+        for i in range(R):
+            for j in range(C):
+                if booms[i][j] == 'O':
+                    visited[i][j] = 1
+                    tmp[i][j] = '.'
+                    for d in dxy:
+                        ni = i + d[0]
+                        nj = j + d[1]
+                        if 0 <= ni <= R-1 and 0 <= nj <= C-1:
+                            if not visited[ni][nj]:
+                                visited[ni][nj] = 1
+                                tmp[ni][nj] = '.'
+        booms = tmp
+
+for line in booms:
+    for i in range(C):
+        if line[i] != '.':
+            print('O', end='')
+        else:
+            print('.', end='')
+    print()
 ```
 
 ### [상미](./봄버맨/상미.py)
@@ -111,7 +151,43 @@
 ### [민웅](./최솟값%20최댓값%20차이%20최소화하기/민웅.py)
 
 ```py
+import sys
+input = sys.stdin.readline
 
+def bt(r, v, M, m, columns):
+    global ans
+
+    if r == N:
+        if (M - m) < ans:
+            ans = (M - m)
+        return
+
+    for i in range(N):
+        if i not in columns:
+            tmp = field[r][i]
+            v[r][i] = 1
+            tmp_M = M
+            tmp_m = m
+            if M < tmp:
+                tmp_M = tmp
+            if m > tmp:
+                tmp_m = tmp
+            columns.append(i)
+            bt(r+1, v, tmp_M, tmp_m, columns)
+            columns.pop()
+            v[r][i] = 0
+
+
+
+N = int(input())
+
+field = [list(map(int, input().split())) for _ in range(N)]
+visited = [[0 for _ in range(N)] for _ in range(N)]
+ans = float('inf')
+
+bt(0, visited, 0, 10001, [])
+
+print(ans)
 ```
 
 ### [상미](./최솟값%20최댓값%20차이%20최소화하기/상미.py)
