@@ -542,6 +542,46 @@ for x in arr:
 ### [민웅](./괄호%20추가하기3/민웅.py)
 
 ```py
+# 16639_괄호 추가하기3_Add parentheses
+import sys
+input = sys.stdin.readline
+
+def bt(eq):
+    global ans
+    try:
+        test = int(eq)
+        if test > ans:
+            ans = test
+        return
+    except:
+        pass
+
+    for i in range(len(eq)):
+        if not eq[i].isdigit():
+            s, e = i, i+1
+            while s > 0 and eq[s-1].isdigit():
+                s -= 1
+
+            while e < len(eq) and eq[e].isdigit():
+                e += 1
+
+            if s < i and e > i+1:
+                try:
+                    tmp = eq[:s] + str(eval(eq[s:e])) + eq[e:]
+                    # print(tmp)
+                    bt(tmp)
+                except:
+                    continue
+    return
+
+
+N = int(input())
+equation = input().strip()
+ans = float('-inf')
+
+bt(equation)
+
+print(ans)
 
 ```
 
@@ -694,7 +734,31 @@ print(ans)
 ### [성구](./최솟값%20최댓값%20차이%20최소화하기/성구.py)
 
 ```py
+import sys
+input = sys.stdin.readline
 
+
+N = int(input())
+arr = [list(map(int, input().split())) for _ in range(N)]
+
+
+def dfs():
+    stack = [(0, 10001, 0, [0] *N)] 
+    minv = 90001
+    while stack:
+        i, small, large, visited = stack.pop()
+        if i >= N:
+            minv = min(minv, large - small)
+            continue
+        for j in range(N):
+            tmp = visited.copy()
+            if not tmp[j]:
+                tmp[j] = 1
+                stack.append((i+1, min(small, arr[i][j]), max(large, arr[i][j]), tmp))
+    return minv
+
+
+print(dfs())
 
 ```
 
@@ -789,7 +853,36 @@ print(*tree)
 ### [성구](./후위%20순회한%20결과/성구.py)
 
 ```py
+import sys
+sys.setrecursionlimit(10**5)
+input = sys.stdin.readline
 
+N = int(input())
+preorder = tuple(map(int, input().split()))
+inorder = tuple(map(int, input().split()))
+
+inindex = {}
+
+for idx, val in enumerate(inorder):
+    inindex[val] = idx
+
+def tree(preorder_start, preorder_end, inorder_start, inorder_end):
+    if preorder_start > preorder_end:
+        return
+    
+    if preorder_start == preorder_end:
+        print(preorder[preorder_start], end = " ")
+        return
+    
+    root = preorder[preorder_start]
+    left = inindex[root] - inorder_start
+    tree(preorder_start+1, preorder_start+left, inorder_start, inindex[root]-1)
+    tree(preorder_start+1+left, preorder_end, inindex[root] + 1, inorder_end)
+    print(root, end =" ")
+    return
+
+
+tree(0, N-1, 0, N-1)
 ```
 
 ### [영준](./후위%20순회한%20결과/영준.py)
