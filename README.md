@@ -144,7 +144,7 @@ def main():
         # 벽 설치
         for i in visited:
             arr[candi[i][0]][candi[i][1]] = "O"
-        
+
         # 검거되는 학생 체크
         for i,j in teacher:
             for di, dj in [(1,0), (0,1), (-1,0), (0,-1)]:
@@ -152,7 +152,7 @@ def main():
                     ni, nj = i+di*k, j+dj*k
                     if 0 <= ni < N and 0 <= nj < N:
                         if arr[ni][nj]  ==  "S":
-                            # 한 명이라도 검거되면 NO  
+                            # 한 명이라도 검거되면 NO
                             return 0
                         if arr[ni][nj] == "O":
                             # 벽인 경우 넘어감
@@ -171,13 +171,13 @@ def main():
 
         tmp = visited.copy()
         # 될 수 있는 경우 모두 체크
-        for j in range(i+1, len(candi)):    
+        for j in range(i+1, len(candi)):
             tmp.append((j))
             if bt(j, tmp):
                 return 1
             tmp.pop()
         return 0
-    
+
     # 벽 후보군이 3개 이하면 무조건 YES
     if len(candi) <= 3:
         print("YES")
@@ -192,12 +192,50 @@ def main():
 
 
 if __name__ == "__main__":
-    main()  
+    main()
 ```
 
 ### [영준](./감시%20피하기/영준.py)
 
 ```py
+def check(N):
+    for i in range(N):
+        for j in range(N):
+            if arr[i][j]=='S':          # 학생이면
+                for di, dj in [[0,1],[1,0],[0,-1],[-1,0]]:  # 각 방향으로
+                    ni, nj = i+di, j+dj
+                    while 0<=ni<N and 0<=nj<N: #
+                        if arr[ni][nj]=='T':        # 교사면 장애물 위치 바꾸기
+                            return False
+                        if arr[ni][nj]=='O' or arr[ni][nj]=='S':        # 장애물이면 다른 방향으로
+                            break
+                        ni += di
+                        nj += dj
+    return True     # 교사를 만난적 없이 끝나면
+
+def f(N):
+    for i in range(len(tmp) - 2):              # 장애물을 설치할 3곳을 고르는 조합
+        for j in range(i+1, len(tmp)-1):
+            for k in range(j+1, len(tmp)):
+                arr[tmp[i][0]][tmp[i][1]] = 'O'
+                arr[tmp[j][0]][tmp[j][1]] = 'O'
+                arr[tmp[k][0]][tmp[k][1]] = 'O'
+                if check(N):
+                    return 'YES'
+                arr[tmp[i][0]][tmp[i][1]] = 'X'
+                arr[tmp[j][0]][tmp[j][1]] = 'X'
+                arr[tmp[k][0]][tmp[k][1]] = 'X'
+    return 'NO'
+
+N = int(input())
+arr = [input().split() for _ in range(N)]
+tmp = []
+for i in range(N):              # 비어있는 칸 목록
+    for j in range(N):
+        if arr[i][j]=='X':
+            tmp.append((i,j))
+
+print(f(N))
 
 ```
 
@@ -254,6 +292,46 @@ for line in booms:
 ### [상미](./봄버맨/상미.py)
 
 ```py
+import sys
+input = sys.stdin.readline
+
+R, C, N =  map(int, input().split())
+arr = [list(map(str, input().strip())) for _ in range(R)]
+time = 1
+
+while time < N:
+    for i in range(R):
+        for j in range(C):
+            if arr[i][j] == '.':
+                arr[i][j] = time
+    time += 1                   # 3번 지문
+
+    if time == N:
+        break
+
+    bomb = []
+    for i in range(R):
+        for j in range(C):
+            if arr[i][j] == 'O' or arr[i][j] == time-3:
+                bomb.append((i, j))
+    for bi, bj in bomb:
+        arr[bi][bj] = '.'
+        if 0 <= bi+1 < R:
+            arr[bi+1][bj] = '.'
+        if 0 <= bi-1 < R:
+            arr[bi-1][bj] = '.'
+        if 0 <= bj+1 < C:
+            arr[bi][bj+1] = '.'
+        if 0 <= bj-1 < C:
+            arr[bi][bj-1] = '.'
+    time += 1                      # 4번 지문
+
+for i in range(R):
+        for j in range(C):
+            if arr[i][j] != '.':
+                arr[i][j] = 'O'
+for x in arr:
+    print(''.join(x))
 
 ```
 
@@ -273,8 +351,8 @@ def main():
     if not N % 2:
         for i in range(R):
             print("O" * C)
-        return 
-    
+        return
+
     # 폭탄 채우기
     def fill_bombs(fields, bombs, now):
         # 자료구조 set을 이용하여 저장
@@ -285,12 +363,12 @@ def main():
                     bombs[now+3].add((i,j))
                     fields[i][j] = "O"
         return
-    
+
     # 폭탄 터짐
     def boom(fields, bombs, now):
         # 집합의 discard를 이용하여 없어지는 폭탄 제거
         if now not in bombs:
-            return 
+            return
         for i,j in bombs[now]:
             for di, dj in [(0,0), (0,1), (0,-1), (1,0), (-1,0)]:
                 ni,nj = i+di, j+dj
@@ -308,8 +386,8 @@ def main():
         for j in range(C):
             if field[i][j] == "O":
                 bombs[3].add((i,j))
-        
-    
+
+
     # t = 1인 경우 while문 돌지 않고 지나감
     t = 2
     while t <= N:
@@ -320,18 +398,18 @@ def main():
             # 짝수 : 3초 뒤에 터질 폭탄 추가
             fill_bombs(field, bombs, t)
         t += 1
-    
-    
+
+
     for i in range(R):
         print("".join(field[i]))
-    
+
 
     return
 
 
 if __name__ == "__main__":
     main()
-    
+
 
 
 ```
@@ -339,7 +417,44 @@ if __name__ == "__main__":
 ### [영준](./봄버맨/영준.py)
 
 ```py
+'''
+# 얼결에 맞춘거라... ^^!
+0 ---- 1 ---- 2 ---- 3 ---- 4 ---- 5
 
+(1) 일부칸에 폭탄 설치
+(2) 폭탄이 설치되어 있지 않은 모든 칸에 폭탄을 설치
+(3) 3초 전에 설치된 폭탄이 모두 폭발
+(4) 폭탄이 설치되어 있지 않은 모든 칸에 폭탄을 설치
+(5) 이후 3,4 반복
+
+'''
+R, C, N = map(int, input().split())
+arr = [list(input()) for _ in range(R)]
+time = [[0]*C for _ in range(R)]
+for i in range(R):
+    for j in range(C):
+        if arr[i][j]=='O':
+            time[i][j] = 3
+for t in range(1, N+1):
+    if t%2==0:           # 폭탄이 설치되어 있지 않은 모든 칸에 폭탄을 설치
+        for i in range(R):
+            for j in range(C):
+                if arr[i][j]=='.':
+                    arr[i][j] = 'O'
+                    time[i][j] = t+3
+    else:
+        for i in range(R):
+            for j in range(C):
+                if time[i][j]==t:
+                    time[i][j] = 0
+                    arr[i][j] = '.'
+                    for di, dj in [[0,1],[1,0],[0,-1],[-1,0]]:
+                        ni, nj = i+di, j+dj
+                        if 0<=ni<R and 0<=nj<C and time[ni][nj]!=t:
+                            arr[ni][nj] = '.'
+                            time[ni][nj] = 0
+for x in arr:
+    print(''.join(x))
 ```
 
 <br/>
@@ -361,6 +476,71 @@ if __name__ == "__main__":
 ### [성구](./괄호%20추가하기3/성구.py)
 
 ```py
+# 16639 괄호 추가하기 3
+# 돌아온 행렬곱셈..
+import sys
+input = sys.stdin.readline
+
+
+def main():
+    # define
+    nums = []
+    operator = []
+
+    # input
+    N = int(input())
+    for s in list(input().strip()):
+        if s.isdecimal():
+            nums.append(int(s))
+        else:
+            operator.append(s)
+
+    # length
+    maxn = N // 2 + 1
+    # dp define
+    dp = [[[0,0] for _ in range((maxn))] for _ in range(maxn)]
+
+    # 최대, 최소 구하는 함수
+    def get_value(oper,  start, pin, end):
+        arr = [
+            calculate(oper[pin], dp[start][pin][0], dp[pin+1][end][0]),
+            calculate(oper[pin], dp[start][pin][0], dp[pin+1][end][1]),
+            calculate(oper[pin], dp[start][pin][1], dp[pin+1][end][0]),
+            calculate(oper[pin], dp[start][pin][1], dp[pin+1][end][1])
+        ]
+        return (max(arr), min(arr))
+
+    # 계산 함수
+    def calculate(operator, num1, num2):
+        if operator == "*":
+            return num1 * num2
+        elif operator == "+":
+            return num1 + num2
+        else:
+            return num1 - num2
+
+    # dp 갱신
+    for cnt in range(maxn):
+        for i in range(maxn-cnt):
+            j = i + cnt
+
+            if cnt:         # i != j dp 갱신
+                # 초기화, [최대, 최소]
+                dp[i][j] = [-9**maxn,9**maxn]
+                for p in range(i,j):    # 길이 내 가장 후순위 계산 선택
+                    maxv, minv = get_value(operator, i, p, j)
+                    # 최대, 최소 갱신
+                    dp[i][j] = [max(maxv, dp[i][j][0]), min(minv, dp[i][j][1])]
+            else:           # i == j, 같은 수로 초기화
+                dp[i][j] = [nums[i], nums[i]]
+
+    # [print(*dp[i]) for i in range(maxn)]
+    print(dp[0][-1][0])
+
+
+
+if __name__ == "__main__":
+    main()
 
 ```
 
@@ -436,7 +616,31 @@ print(ans)
 ### [성구](./최솟값%20최댓값%20차이%20최소화하기/성구.py)
 
 ```py
+import sys
+input = sys.stdin.readline
 
+
+N = int(input())
+arr = [list(map(int, input().split())) for _ in range(N)]
+
+
+def dfs():
+    stack = [(0, 10001, 0, [0] *N)] 
+    minv = 90001
+    while stack:
+        i, small, large, visited = stack.pop()
+        if i >= N:
+            minv = min(minv, large - small)
+            continue
+        for j in range(N):
+            tmp = visited.copy()
+            if not tmp[j]:
+                tmp[j] = 1
+                stack.append((i+1, min(small, arr[i][j]), max(large, arr[i][j]), tmp))
+    return minv
+
+
+print(dfs())
 
 ```
 
